@@ -1,0 +1,123 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Data Analysis Results</title>
+    <!-- Bootstrap CSS from CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        #results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Data Analysis Results</h1>
+        <p>This page displays the results of the data analysis performed by the Python script.</p>
+        <div id="results" class="mt-3">
+            <!-- Results will be displayed here -->
+            <div id="loading" class="alert alert-info" role="alert">
+                Loading results...
+            </div>
+            <div id="error" class="alert alert-danger" role="alert" style="display: none;">
+                Error: <span id="errorMessage"></span>
+            </div>
+            <div id="dataDisplay" style="display: none;">
+                <div id="summary" class="mb-3">
+                    <h2>Summary Statistics</h2>
+                    <table class="table table-striped" id="summaryTable">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Summary data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="detailed" class="mb-3">
+                    <h2>Detailed Data</h2>
+                    <table class="table table-striped" id="detailedTable">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Detailed data will be inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (optional, for some Bootstrap features) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to fetch and display the results from result.json
+        async function loadResults() {
+            try {
+                const response = await fetch('result.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Hide loading and show dataDisplay
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dataDisplay').style.display = 'block';
+
+                // Populate Summary Table
+                const summaryTableBody = document.querySelector('#summaryTable tbody');
+                summaryTableBody.innerHTML = ''; // Clear existing content
+                for (const [key, value] of Object.entries(data.summary)) {
+                    const row = document.createElement('tr');
+                    const keyCell = document.createElement('td');
+                    keyCell.textContent = key;
+                    const valueCell = document.createElement('td');
+                    valueCell.textContent = value;
+                    row.appendChild(keyCell);
+                    row.appendChild(valueCell);
+                    summaryTableBody.appendChild(row);
+                }
+
+                // Populate Detailed Data Table
+                const detailedTableBody = document.querySelector('#detailedTable tbody');
+                detailedTableBody.innerHTML = ''; // Clear existing content
+                for (const [category, value] of Object.entries(data.detailed)) {
+                    const row = document.createElement('tr');
+                    const categoryCell = document.createElement('td');
+                    categoryCell.textContent = category;
+                    const valueCell = document.createElement('td');
+                    valueCell.textContent = value;
+                    row.appendChild(categoryCell);
+                    row.appendChild(valueCell);
+                    detailedTableBody.appendChild(row);
+                }
+
+
+            } catch (error) {
+                // Display error message
+                console.error('Error loading results:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('errorMessage').textContent = error.message;
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        // Call the function to load and display the results when the page loads
+        document.addEventListener('DOMContentLoaded', loadResults);
+    </script>
+</body>
+</html>
